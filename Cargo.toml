@@ -1,5 +1,5 @@
 [package]
-name = "bors-rs"
+name = "bors"
 version = "0.1.0"
 authors = ["Jack Moffitt <metajack@fb.com>", "Brandon Williams <bmwill@fb.com>"]
 edition = "2018"
@@ -7,3 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hyper = "=0.13.0-alpha.4"
+tokio = "=0.2.0-alpha.6"
+tower-service = "0.3.0-alpha.2"
+futures = { version = "=0.3.0-alpha.19", package = "futures-preview" }
+graphql_client = "0.8.0"
