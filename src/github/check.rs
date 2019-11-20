@@ -1,4 +1,4 @@
-use super::{DateTime, NodeId, Oid, User};
+use super::{DateTime, EventType, NodeId, Oid, User};
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -33,6 +33,7 @@ pub struct CheckOutput {
     pub images: Option<Vec<Image>>,
 }
 
+#[derive(Debug, Deserialize)]
 pub struct CheckRun {
     pub id: u64,
     pub head_sha: Oid,
@@ -52,6 +53,7 @@ pub struct CheckRun {
     // pull_requests: Vec<PullRequestRef>,
 }
 
+#[derive(Debug, Deserialize)]
 pub struct App {
     pub id: u64,
     pub slug: String,
@@ -64,9 +66,10 @@ pub struct App {
     pub created_at: DateTime,
     pub updated_at: DateTime,
     pub permissions: HashMap<String, String>,
-    pub events: Vec<String>,
+    pub events: Vec<EventType>,
 }
 
+#[derive(Debug, Deserialize)]
 pub struct CheckSuite {
     pub id: u64,
     pub node_id: NodeId,
@@ -81,4 +84,23 @@ pub struct CheckSuite {
     pub app: App,
     pub created_at: DateTime,
     pub updated_at: DateTime,
+    pub latest_check_runs_count: Option<u64>,
+    pub check_runs_url: Option<String>,
+}
+
+#[cfg(test)]
+mod test {
+    use super::{CheckRun, CheckSuite};
+
+    #[test]
+    fn check_run() {
+        const CHECK_RUN_JSON: &str = include_str!("../test-input/check-run.json");
+        let _: CheckRun = serde_json::from_str(CHECK_RUN_JSON).unwrap();
+    }
+
+    #[test]
+    fn check_suite() {
+        const CHECK_SUITE_JSON: &str = include_str!("../test-input/check-suite.json");
+        let _: CheckSuite = serde_json::from_str(CHECK_SUITE_JSON).unwrap();
+    }
 }

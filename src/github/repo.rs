@@ -78,6 +78,31 @@ pub struct Repository {
     pub default_branch: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct Author {
+    pub name: String,
+    pub email: String,
+    pub username: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Commit {
+    pub id: Oid,
+    pub tree_id: Oid,
+    pub distinct: bool,
+    pub message: String,
+    pub timestamp: DateTime,
+    pub url: String,
+    pub author: Author,
+    pub committer: Author,
+    /// List of added files
+    pub added: Vec<String>,
+    /// List of removed files
+    pub removed: Vec<String>,
+    /// List of modified files
+    pub modified: Vec<String>,
+}
+
 #[cfg(test)]
 mod test {
     use super::Repository;

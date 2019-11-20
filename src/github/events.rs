@@ -1,7 +1,9 @@
-use super::{PullRequest, Repository, Review, ReviewComment, User};
-use serde::Deserialize;
+use super::{Commit, Oid, PullRequest, Pusher, Repository, Review, ReviewComment, User};
+use serde::{de, Deserialize};
+use std::str::FromStr;
 use thiserror::Error;
 
+#[derive(Debug)]
 pub enum EventType {
     CheckRun,
     CheckSuite,
@@ -41,9 +43,10 @@ pub enum EventType {
     PullRequestReview,
     PullRequestReviewComment,
     Push,
+    RegistryPackage,
     Release,
-    RepositoryDispatch,
     Repository,
+    RepositoryDispatch,
     RepositoryImport,
     RepositoryVulnerabilityAlert,
     SecurityAdvisory,
@@ -58,7 +61,7 @@ pub enum EventType {
 #[error("invalid github webhook event")]
 pub struct ParseEventTypeError;
 
-impl std::str::FromStr for EventType {
+impl FromStr for EventType {
     type Err = ParseEventTypeError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -103,6 +106,7 @@ impl std::str::FromStr for EventType {
             "pull_request_review" => Ok(PullRequestReview),
             "pull_request_review_comment" => Ok(PullRequestReviewComment),
             "push" => Ok(Push),
+            "registry_package" => Ok(RegistryPackage),
             "release" => Ok(Release),
             "repository_dispatch" => Ok(RepositoryDispatch),
             "repository" => Ok(Repository),
@@ -116,6 +120,16 @@ impl std::str::FromStr for EventType {
             "watch" => Ok(Watch),
             _ => Err(ParseEventTypeError),
         }
+    }
+}
+
+impl<'de> Deserialize<'de> for EventType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: de::Deserializer<'de>,
+    {
+        let s = <&str>::deserialize(deserializer)?;
+        Self::from_str(s).map_err(de::Error::custom)
     }
 }
 
@@ -183,4 +197,33 @@ pub struct PullRequestReviewCommentEvent {
     pull_request: PullRequest,
     repository: Repository,
     sender: User,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PushEvent {
+    #[serde(rename = "ref")]
+    git_ref: String,
+    before: Oid,
+    after: Oid,
+    pusher: Pusher,
+    created: bool,
+    deleted: bool,
+    forced: bool,
+    base_ref: Option<String>,
+    compare: String,
+    commits: Vec<Commit>,
+    head_commit: Option<Commit>,
+    repository: Repository,
+    sender: User,
+}
+
+#[cfg(test)]
+mod test {
+    use super::PushEvent;
+
+    #[test]
+    fn push_event() {
+        const PUSH_JSON: &str = include_str!("../test-input/push-event.json");
+        let _push: PushEvent = serde_json::from_str(PUSH_JSON).unwrap();
+    }
 }
