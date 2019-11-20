@@ -76,6 +76,8 @@ pub struct Repository {
     pub open_issues: u64,
     pub watchers: u64,
     pub default_branch: String,
+    // parent: Option<Box<Repository>>,
+    // source: Option<Box<Repository>>,
 }
 
 #[derive(Debug, Deserialize)]

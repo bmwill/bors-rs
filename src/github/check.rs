@@ -23,6 +23,25 @@ pub struct Image {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Conclusion {
+    Success,
+    Failure,
+    Neutral,
+    Cancelled,
+    TimedOut,
+    ActionRequired,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum CheckStatus {
+    Queued,
+    InProgress,
+    Completed,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct CheckOutput {
     pub title: String,
     pub summary: String,
@@ -31,6 +50,31 @@ pub struct CheckOutput {
     pub annotations_url: Option<String>,
     pub annotations: Option<Vec<Annotation>>,
     pub images: Option<Vec<Image>>,
+}
+
+// Maybe rename these?
+#[derive(Debug, Deserialize)]
+pub struct CheckPullRequest {
+    url: String,
+    id: u64,
+    number: u64,
+    head: CheckBranch,
+    base: CheckBranch,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CheckBranch {
+    #[serde(rename = "ref")]
+    git_ref: String,
+    sha: Oid,
+    repo: CheckRepo,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CheckRepo {
+    id: u64,
+    url: String,
+    name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -42,15 +86,15 @@ pub struct CheckRun {
     pub url: String,
     pub html_url: String,
     pub details_url: String,
-    pub status: String,
-    pub conclusion: Option<String>,
+    pub status: CheckStatus,
+    pub conclusion: Option<Conclusion>,
     pub started_at: DateTime,
     pub completed_at: DateTime,
     pub output: CheckOutput,
     pub name: String,
     pub check_suite: CheckSuite,
     pub app: App,
-    // pull_requests: Vec<PullRequestRef>,
+    pub pull_requests: Vec<CheckPullRequest>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -75,12 +119,12 @@ pub struct CheckSuite {
     pub node_id: NodeId,
     pub head_branch: Option<String>,
     pub head_sha: Oid,
-    pub status: String,
-    pub conclusion: Option<String>,
+    pub status: CheckStatus,
+    pub conclusion: Option<Conclusion>,
     pub url: String,
     pub before: Option<String>,
     pub after: Option<String>,
-    // pull_requests: Vec<PullRequestRef>,
+    pub pull_requests: Vec<CheckPullRequest>,
     pub app: App,
     pub created_at: DateTime,
     pub updated_at: DateTime,
