@@ -46,7 +46,7 @@ pub struct PullRequest {
     pub statuses_url: String,
     pub head: CommitRef,
     pub base: CommitRef,
-    // pub _links: ???
+    pub _links: Option<PrLinks>,
     pub author_association: String,
     pub draft: Option<bool>,
     pub merged: Option<bool>,
@@ -61,6 +61,24 @@ pub struct PullRequest {
     pub additions: Option<u64>,
     pub deletions: Option<u64>,
     pub changed_files: Option<u64>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct PrLinks {
+    pub comments: PrLink,
+    pub commits: PrLink,
+    pub html: PrLink,
+    pub issue: PrLink,
+    pub review_comment: PrLink,
+    pub review_comments: PrLink,
+    #[serde(rename = "self")]
+    pub self_link: PrLink,
+    pub statuses: PrLink,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct PrLink {
+    pub href: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]
