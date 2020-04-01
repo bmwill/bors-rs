@@ -1,0 +1,23 @@
+[package]
+name = "probot"
+version = "0.1.0"
+authors = ["Brandon Williams <bmwill@fb.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+async-trait = "0.1.24"
+bytes = "0.5"
+futures = "0.3"
+github = { path = "../github" }
+hyper = "0.13"
+hyper-tls = "0.4"
+log = "0.4.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["raw_value"] }
+thiserror = "1.0.11"
+tokio = { version = "0.2", features = ["rt-core"] }
+
+[dev-dependencies]
+tokio = { version = "0.2", features = ["full"] }
